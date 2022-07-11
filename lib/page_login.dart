@@ -1,5 +1,6 @@
 
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +61,10 @@ class _PageLogin extends State<PageLogin> {
                         borderSide: BorderSide(color: HexColor("#DDDDDD"), width: 1.0),
                       ),
                       hintText: '0812345678',
+                      prefixIcon: Padding(
+                        padding: EdgeInsets.only(left: 2), // add padding to adjust icon
+                        child: Icon(Icons.phone, size: 20,),
+                      ),
                     ),
                   ),
                 ),
@@ -71,17 +76,21 @@ class _PageLogin extends State<PageLogin> {
         ),
         bottomSheet: Container(
           width: double.infinity,
-          height: 46,
-          padding : const EdgeInsets.only(left: 25,right: 25),
+          height: 55,
+          padding : const EdgeInsets.only(left: 25,right: 25,bottom: 10),
           child : RaisedButton(
+            elevation: 0,
               shape: RoundedRectangleBorder(side: BorderSide(
-                  color: Colors.black,
+                  color: Colors.white,
                   width: 0.1,
                   style: BorderStyle.solid
               ),
                 borderRadius: BorderRadius.circular(5.0),
               ),
-            child : Text("sasas")
+            child : Text("CONTINUE", style: GoogleFonts.lato(fontWeight: FontWeight.bold),),
+            onPressed: (){
+
+            },
           )
         ),
       ), onWillPop: onWillPop);
