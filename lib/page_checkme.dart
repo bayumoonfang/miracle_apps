@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:miracle_apps/Helper/app_helper.dart';
 import 'package:miracle_apps/Helper/page_route.dart';
+import 'package:miracle_apps/page_home.dart';
 import 'package:miracle_apps/page_login.dart';
 import 'package:toast/toast.dart';
 
@@ -32,9 +33,11 @@ class _PageCheck extends State<PageCheck> {
     await AppHelper().getSession().then((value){
       setState(() {
         val_getPhone = value[0];
-        print(value[0]);
+        //print(value[0]);
         if(val_getPhone == null) {
           Navigator.pushReplacement(context, ExitPage(page: PageLogin()));
+        } else {
+          Navigator.pushReplacement(context, ExitPage(page: Home()));
         }
       });});
   }

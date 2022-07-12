@@ -43,7 +43,7 @@ dependencies:
   shared_preferences: ^0.5.8
   connectivity: ^3.0.6
   toast: ^0.1.5
-
+  flushbar: ^1.10.4
 
 
 dev_dependencies:
@@ -94,12 +94,7 @@ flutter:
     - family: Roboto
       fonts:
         - asset: fonts/robotoreguler.ttf
-    - family: Poppins
-      fonts:
-        - asset: Poppins-Regular.ttf
-    - family: Lato
-      fonts:
-        - asset: Lato-Regular.ttf
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:

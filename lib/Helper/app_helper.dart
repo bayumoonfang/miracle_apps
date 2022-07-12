@@ -24,7 +24,7 @@ class AppHelper{
   }
 
   Future<dynamic> getSession () async {
-    String getPhone = await Session.getPhone();
+    String getPhone = await Session.getCustPhone();
     return [getPhone];
 
   }

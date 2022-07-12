@@ -1,0 +1,1 @@
+String applink = "https://duakata-dev.com/project/newmiracle/";
