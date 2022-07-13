@@ -10,6 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:http/http.dart' as http;
 import 'package:miracle_apps/Helper/page_route.dart';
+import 'package:miracle_apps/page_login.dart';
+import 'package:miracle_apps/page_preparedata.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'Helper/app_link.dart';
@@ -67,7 +69,7 @@ class _LoginPin extends State<LoginPin> {
   String acc_modified = "";
   String acc_email = "";
   String acc_name = "";
-
+  String acc_myID = "";
   proses_session() async {
     final response = await http.post(applink+"sistem_api.php?act=getdata_cust",
         body: {"phone": widget.getPhone},
@@ -85,11 +87,18 @@ class _LoginPin extends State<LoginPin> {
       acc_modified = data["acc_modified"].toString();
       acc_email = data["acc_email"].toString();
       acc_name = data["acc_name"].toString();
+      acc_myID = data["acc_myid"].toString();
     });
 
     savePref(acc_email, acc_identifier, acc_partyid, acc_name, widget.getPhone, acc_address, acc_birthday,
-        acc_birthmonth, acc_personality, acc_createddate, acc_status, acc_modified);
-    Navigator.pushReplacement(context, ExitPage(page: Home()));
+        acc_birthmonth, acc_personality, acc_createddate, acc_status, acc_modified, acc_identifier, acc_myID);
+
+    if(data["message"] == '1') {
+      Navigator.pushReplacement(context, ExitPage(page: Home()));
+    } else {
+      Navigator.pushReplacement(context, ExitPage(page: PrepareData()));
+    }
+
     //TINGGAL GET DATA DARI FLOW DAN INSERT KE DATA CUSTOMER LOCAL
 
   }
@@ -133,7 +142,9 @@ class _LoginPin extends State<LoginPin> {
       String val_personality,
       String val_createddate,
       String val_status,
-      String val_modified) async {
+      String val_modified,
+      String val_identifier,
+      String val_myid) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       //preferences.setInt("value", value);
@@ -148,6 +159,8 @@ class _LoginPin extends State<LoginPin> {
       preferences.setString("cust_createddate", val_createddate);
       preferences.setString("cust_status", val_status);
       preferences.setString("cust_modified", val_modified);
+      preferences.setString("cust_identifier", val_identifier);
+      preferences.setString("cust_myid", val_myid);
       preferences.commit();
     });
 
@@ -189,7 +202,7 @@ class _LoginPin extends State<LoginPin> {
         child: Column(
           children: [
             Align(alignment: Alignment.center,
-                child : Padding(padding: const EdgeInsets.only(top: 50),child: Text("Input Your PIN",style:
+                child : Padding(padding: const EdgeInsets.only(top: 50),child: Text("Login With Your PIN",style:
                 GoogleFonts.poppins(fontWeight: FontWeight.bold,
                     fontSize: 20),),)),
             Align(alignment: Alignment.center,
@@ -349,6 +362,7 @@ class _LoginPin extends State<LoginPin> {
   }
 
   Future<bool> onWillPop() {
-    Navigator.pop(context);
+    Navigator.pushReplacement(context, ExitPage(page: PageLogin()));
+
   }
 }

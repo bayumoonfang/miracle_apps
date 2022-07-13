@@ -32,9 +32,7 @@ class _PageCheck extends State<PageCheck> {
       Toast.LENGTH_LONG);}});
     await AppHelper().getSession().then((value){
       setState(() {
-        val_getPhone = value[0];
-        //print(value[0]);
-        if(val_getPhone == null) {
+        if(value[0] == null) {
           Navigator.pushReplacement(context, ExitPage(page: PageLogin()));
         } else {
           Navigator.pushReplacement(context, ExitPage(page: Home()));

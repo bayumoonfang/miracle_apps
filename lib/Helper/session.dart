@@ -53,4 +53,13 @@ class Session {
     return preferences.getString("cust_modified");
   }
 
+  static Future<String> getCustIdentifier() async {
+    final SharedPreferences preferences = await _prefs;
+    return preferences.getString("cust_identifier");
+  }
+
+  static Future<String> getCustMyID() async {
+    final SharedPreferences preferences = await _prefs;
+    return preferences.getString("cust_myid");
+  }
 }

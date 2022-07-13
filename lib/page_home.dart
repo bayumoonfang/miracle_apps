@@ -8,6 +8,19 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:miracle_apps/Helper/app_helper.dart';
+import 'package:miracle_apps/Helper/app_link.dart';
+import 'package:miracle_apps/Helper/page_route.dart';
+import 'package:miracle_apps/Redeem/page_redeempoint.dart';
+import 'package:miracle_apps/SplashScreen.dart';
+import 'package:miracle_apps/page_preparedata.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toast/toast.dart';
+import 'package:intl/intl.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+import 'Redeem/page_redeemoutstanding.dart';
 
 class Home extends StatefulWidget{
 
@@ -18,14 +31,101 @@ class Home extends StatefulWidget{
 
 class _Home extends State<Home> {
 
+  String countredem_verif = '0';
+
+
+
+
+  _logout() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      preferences.setString("email", null);
+      preferences.setString("partyid", null);
+      preferences.setString("cust_name", null);
+      preferences.setString("cust_phone", null);
+      preferences.setString("cust_address", null);
+      preferences.setString("cust_birthday", null);
+      preferences.setString("cust_birthmonth", null);
+      preferences.setString("cust_personality", null);
+      preferences.setString("cust_createddate", null);
+      preferences.setString("cust_status", null);
+      preferences.setString("cust_modified", null);
+      preferences.setString("cust_identifier", null);
+      preferences.setString("cust_myid", null);
+      preferences.commit();
+      Navigator.pushReplacement(context, ExitPage(page: SplashScreen()));
+    });
+  }
+
+
+  void showToast(String msg, {int duration, int gravity}) {
+    Toast.show(msg, context, duration: duration, gravity: gravity);
+  }
+  //=============================================================================
+  String getEmail = '...';
+  String getPhone = '...';
+  String getIdentifier = '...';
+  String getPartyID = '...';
+  String getMyID = '...';
+  String getCustName = '...';
+  String getPoint = "0";
+  _startingVariable() async {
+    await AppHelper().getConnect().then((value){if(value == 'ConnInterupted'){
+      showToast("Koneksi terputus..", gravity: Toast.CENTER,duration:
+      Toast.LENGTH_LONG);}});
+    await AppHelper().getSession().then((value){
+      setState(() {
+        getPhone = value[0];
+        getIdentifier = value[1];
+        getPartyID = value[2];
+        getMyID = value[12];
+        getCustName = value[11];
+      });});
+    await AppHelper().getDetailUser(getPhone.toString(), getPartyID.toString()).then((value){
+      setState(() {
+        getPoint = value[0];
+      });
+    });
+    EasyLoading.dismiss();
+
+  }
+
+
+  _getCountRedeemVerif() async {
+    final response =  await http.post(
+        applink+"sistem_api.php?act=cekredeem_verif",
+        body: {"myid": getMyID});
+    Map data2 = jsonDecode(response.body);
+    setState(() {
+      if(data2["message"] == '1') {
+        countredem_verif = "1";
+      } else {
+        countredem_verif = "0";
+      }
+
+    });
+  }
+
+
+  loadData() async {
+    await _startingVariable();
+    await _getCountRedeemVerif();
+    //await getData();
+  }
+
+  FutureOr onGoBack(dynamic value) {
+    loadData();
+    setState(() {});
+  }
+
+
 
   @override
   void initState() {
     super.initState();
-    EasyLoading.dismiss();
+    EasyLoading.show(status: "Loading...");
+    loadData();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +142,7 @@ class _Home extends State<Home> {
               hoverColor: Colors.transparent,
               child : FaIcon(FontAwesomeIcons.cog, size: 20,color: Colors.black,),
               onTap: () {
+                _logout();
                 //Navigator.push(context, ExitPage(page: SettingHome(getEmail, getLegalCode)));
               },
             )
@@ -84,7 +185,7 @@ class _Home extends State<Home> {
                                   padding: const EdgeInsets.only(top: 2),
                                   height: 33,
                                   width: double.infinity,
-                                  child:           Text("Ragil Bayu Respati",
+                                  child:           Text(getCustName,
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontFamily: 'VarelaRound',
@@ -150,7 +251,9 @@ class _Home extends State<Home> {
                                   Row(
                                     children: [
                                       FaIcon(FontAwesomeIcons.store,color: Colors.black,size: 14,),
-                                      Padding(padding: const EdgeInsets.only(left: 5),child: Text("987233",style: GoogleFonts.lato(fontSize: 14),),)
+                                      Padding(padding: const EdgeInsets.only(left: 5),child: Text(NumberFormat.currency(
+                                          locale: 'id', decimalDigits: 0, symbol: '').format(
+                                          int.parse(getPoint.toString())),style: GoogleFonts.lato(fontSize: 14),),)
                                     ],
                                   ),
                                   Align(alignment: Alignment.centerLeft,child : Padding(padding: const EdgeInsets.only(top:8),
@@ -239,6 +342,37 @@ class _Home extends State<Home> {
             padding: const EdgeInsets.only(top: 200,left: 25,right: 25),
             child: Column(
               children: [
+
+                countredem_verif == '1' ?
+                Padding(
+                  padding : const EdgeInsets.only(bottom: 15),
+                  child : InkWell(
+                    child:  Container(
+                        padding: const EdgeInsets.only(bottom: 30),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: HexColor("#DDDDDD"),
+                        ),
+                        width: double.infinity,
+                        height: 90,
+                        child: ListTile(
+                          title:
+                          Text("Outstanding Redeem", style: TextStyle(
+                              fontFamily: 'VarelaRound',fontWeight: FontWeight.bold,
+                              fontSize: 14,color: HexColor("#000000"))),
+                          subtitle:
+                          Text("Anda masih mempunyai redeem poin yang belum diproses", style: TextStyle(fontFamily: 'VarelaRound'
+                              ,fontSize: 12,color: HexColor("#000000"))),
+                          trailing: FaIcon(FontAwesomeIcons.angleRight,color: HexColor("#000000")),
+                        )
+                    ),
+                    onTap: () {
+                      Navigator.push(context, ExitPage(page: PageRedeemOutstanding(getMyID))).then(onGoBack);
+                    },
+                  )
+                )
+                : Container(),
+
                 InkWell(
                   child:  Container(
                       padding: const EdgeInsets.only(bottom: 30),
@@ -274,7 +408,7 @@ class _Home extends State<Home> {
           children: [
             InkWell(
               onTap: (){
-               // Navigator.push(context, ExitPage(page: JualanHome(getEmail.toString(),getLegalCode.toString(),getLegalId.toString(), getNamaUser.toString())));
+                Navigator.push(context, ExitPage(page: PageRedeemPoint())).then(onGoBack);
               },
               child:Column(
                 children: [

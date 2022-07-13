@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:miracle_apps/Helper/app_helper.dart';
 import 'package:miracle_apps/Helper/page_route.dart';
+import 'package:miracle_apps/page_loginpin.dart';
 import 'package:miracle_apps/page_setpin.dart';
 import 'package:miracle_apps/page_verifikasi.dart';
 import 'package:toast/toast.dart';
@@ -85,26 +86,39 @@ class _PageLogin extends State<PageLogin> {
             body: {"phone": _phonenumber.text},
             headers: {"Accept":"application/json"});
         Map data2 = jsonDecode(response2.body);
-        if(data2["message"] == '1') {
-          await http.post(
-              applink+"sistem_api.php?act=sendemail_verifikasi",
-              body: {"phone": _phonenumber.text,"email" : showdata["data"]["custemail"].toString(),
-                "custnama" : showdata["data"]["custnama"].toString()});
-          Navigator.push(context, ExitPage(page: PageVerifikasi(showdata["data"]["custemail"].toString(), _phonenumber.text,
-              showdata["data"]["custnama"].toString())));
-          _phonenumber.clear();
-          setState(() {
-            isLoading = false;
-          });
-        } else if(data2["message"] == '2') {
+        if(data2["cekuser"] == '0') {
+            await http.post(
+                applink+"sistem_api.php?act=sendemail_verifikasi",
+                body: {"phone": _phonenumber.text,"email" : showdata["data"]["custemail"].toString(),
+                  "custnama" : showdata["data"]["custnama"].toString()});
+            Navigator.push(context, ExitPage(page: PageVerifikasi(showdata["data"]["custemail"].toString(), _phonenumber.text,
+                showdata["data"]["custnama"].toString())));
+            _phonenumber.clear();
+            setState(() {
+              isLoading = false;
+            });
+            return false;
+          }
+
+          if(data2["cekpin"] == '0') {
             Navigator.push(context, ExitPage(page: PageSetPin(_phonenumber.text)));
             _phonenumber.clear();
             setState(() {
               isLoading = false;
             });
+            return false;
+          }
+
+        if(data2["cekuser"] == '1' && data2["cekpin"] == '1') {
+          Navigator.push(context, ExitPage(page: LoginPin(_phonenumber.text)));
+          _phonenumber.clear();
+          setState(() {
+            isLoading = false;
+          });
+          return false;
         }
       }
-      //showsuccess(showdata["data"]["custnama"]);
+
   }
 
 
